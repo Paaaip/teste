@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle - Webhooks</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --gray-color: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            color: var(--light-color);
+            font-size: 0.9rem;
+        }
+        
+        .card {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card:last-child {
+            border-bottom: none;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+        
+        .flex-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .flex-container > * {
+            flex: 1;
+        }
+        
+        .status-display {
+            background-color: var(--light-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-align: center;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-inactive {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toggle-label {
+            margin-bottom: 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--success-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--gray-color);
+            font-size: 0.8rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            .flex-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Painel de Controle - Webhooks</h1>
+            <p>Gerencie disparos e configurações de webhook</p>
+        </header>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i>📤</i> Configurar Disparos
+            </h2>
+            <div class="form-group">
+                <label for="numDisparos">Número de Disparos</label>
+                <input type="text" id="numDisparos" placeholder="Digite o número">
+            </div>
+            <div class="flex-container">
+                <button class="btn" onclick="enviarDisparos()">Enviar</button>
+                <div class="status-display">
+                    <span>Disparos a serem feitos:</span>
+                    <strong id="numDisparosOut">0</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i>📊</i> Status dos Disparos
+            </h2>
+            <div class="flex-container">
+                <div class="status-display">
+                    <span>Disparos feitos:</span>
+                    <strong id="visorDisparos">0</strong>
+                </div>
+                <button class="btn btn-success" onclick="checharDisparos()">Atualizar</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i>🔄</i> Reiniciar Planilha
+            </h2>
+            <button class="btn btn-warning" onclick="reiniciarPlanilha()">Reiniciar</button>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i>🔒</i> Travar Disparos
+            </h2>
+            <div class="toggle-container">
+                <label class="toggle-label">Status do Bloqueio:</label>
+                <div class="status-display" id="travacheck">Desconhecido</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggleTrava" onchange="travaswitch()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <footer>
+            Painel de Controle Webhooks &copy; 2023
+        </footer>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const WEBHOOK_POST = "https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-post";
+        const WEBHOOK_GET = "https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-get";
+        
+        // Função para mostrar notificações
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        async function enviarDisparos() {
+            const valor = document.getElementById("numDisparos").value;
+            
+            // Validação básica
+            if (!valor || isNaN(valor) || valor < 0) {
+                showNotification("Por favor, insira um número válido!", true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(WEBHOOK_POST, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ numDisparos: valor })
+                });
+                
+                if (response.ok) {
+                    document.getElementById("numDisparosOut").innerHTML = valor;
+                    showNotification(`Disparos configurados para: ${valor}`);
+                } else {
+                    throw new Error('Erro na resposta do servidor');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar disparos:', error);
+                showNotification("Erro ao configurar disparos!", true);
+            }
+        }
+        
+        async function checharDisparos() {
+            try {
+                const resposta = await fetch(WEBHOOK_GET, { method: 'GET' });
+                const data = await resposta.json().catch(async () => await resposta.text());
+                document.getElementById("visorDisparos").innerHTML = JSON.stringify(data);
+                showNotification("Status atualizado com sucesso!");
+            } catch (error) {
+                console.error('Erro ao verificar disparos:', error);
+                showNotification("Erro ao atualizar status!", true);
+            }
+        }
+        
+        async function reiniciarPlanilha() {
+            if (confirm("Tem certeza que deseja reiniciar a planilha? Esta ação não pode ser desfeita.")) {
+                try {
+                    // Aqui você implementaria a lógica para reiniciar a planilha
+                    showNotification("Planilha reiniciada com sucesso!");
+                } catch (error) {
+                    console.error('Erro ao reiniciar planilha:', error);
+                    showNotification("Erro ao reiniciar planilha!", true);
+                }
+            }
+        }
+        
+        async function travaswitch() {
+            const toggle = document.getElementById("toggleTrava");
+            const travaStatus = document.getElementById("travacheck");
+            
+            try {
+                await fetch(WEBHOOK_POST, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ toggle: "toggleBlock" })
+                });
+                
+                // Atualiza visualmente o estado
+                if (travaStatus.textContent === "true" || travaStatus.textContent === "Ativo") {
+                    travaStatus.textContent = "Inativo";
+                    travaStatus.className = "status-display status-inactive";
+                    showNotification("Disparos liberados!");
+                } else {
+                    travaStatus.textContent = "Ativo";
+                    travaStatus.className = "status-display status-active";
+                    showNotification("Disparos travados!");
+                }
+                
+                // Força uma verificação do estado real após um segundo
+                setTimeout(checktrava, 1000);
+            } catch (error) {
+                console.error('Erro ao alternar trava:', error);
+                // Reverte visualmente em caso de erro
+                toggle.checked = !toggle.checked;
+                showNotification("Erro ao alterar estado da trava!", true);
+            }
+        }
+        
+        async function checktrava() {
+            try {
+                const trava = await fetch("https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-checktrava", {method: "GET"});
+                const data = await trava.json().catch(async () => await trava.text());
+                
+                const travaStatus = document.getElementById("travacheck");
+                const toggle = document.getElementById("toggleTrava");
+                
+                if (data === true || data === "true") {
+                    travaStatus.textContent = "Ativo";
+                    travaStatus.className = "status-display status-active";
+                    toggle.checked = true;
+                } else {
+                    travaStatus.textContent = "Inativo";
+                    travaStatus.className = "status-display status-inactive";
+                    toggle.checked = false;
+                }
+            } catch (error) {
+                console.error('Erro ao verificar estado da trava:', error);
+            }
+        }
+        
+        window.onload = function(){
+            checharDisparos();
+            checktrava();
+        }
+    </script>
+</body>
+</html>
