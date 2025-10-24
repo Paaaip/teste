@@ -384,6 +384,18 @@
                 showNotification("Erro ao configurar disparos!", true);
             }
         }
+
+        async function checkDisparosOut() {
+            try {
+                const resposta = await fetch("https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-checklimit", { method: 'GET' });
+                const data = await resposta.json().catch(async () => await resposta.text());
+                document.getElementById("numDisparosOut").innerHTML = JSON.stringify(data);
+                showNotification("Status atualizado com sucesso!");
+            } catch (error) {
+                console.error('Erro ao verificar disparos:', error);
+                showNotification("Erro ao atualizar status!", true);
+            }
+        }
         
         async function checharDisparos() {
             try {
@@ -466,6 +478,7 @@
         window.onload = function(){
             checharDisparos();
             checktrava();
+            checkDisparosOut();
         }
     </script>
 </body>
