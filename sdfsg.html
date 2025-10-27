@@ -280,16 +280,16 @@
         
         <div class="card">
             <h2 class="card-title">
-                <i>📤</i> Configurar Limite de Disparos
+                <i>📤</i> Configurar Limite de Disparos Diário
             </h2>
             <div class="form-group">
-                <label for="numDisparos">Número de Disparos</label>
+                <label for="numDisparos">Número de Limite de Disparos Diário</label>
                 <input type="text" id="numDisparos" placeholder="Digite o número">
             </div>
             <div class="flex-container">
                 <button class="btn" onclick="enviarDisparos()">Enviar</button>
                 <div class="status-display">
-                    <span>Limite de disparos:</span>
+                    <span>Disparos a serem feitos hoje:</span>
                     <strong id="numDisparosOut">0</strong>
                 </div>
             </div>
@@ -301,10 +301,31 @@
             </h2>
             <div class="flex-container">
                 <div class="status-display">
-                    <span>Disparos feitos:</span>
+                    <span>Disparos feitos hoje:</span>
                     <strong id="visorDisparos">0</strong>
                 </div>
                 <button class="btn btn-success" onclick="checharDisparos()">Atualizar</button>
+            </div>
+            <div class="flex-container">
+                <div class="status-display">
+                    <span>Números totais:</span>
+                    <strong id="visorNumTotais">0</strong>
+                </div>
+                <button class="btn btn-success" onclick="checharNumTotais()">Atualizar</button>
+            </div>
+            <div class="flex-container">
+                <div class="status-display">
+                    <span>Tentativas de disparo:</span>
+                    <strong id="visorTentativas">0</strong>
+                </div>
+                <button class="btn btn-success" onclick="checharTentativas()">Atualizar</button>
+            </div>
+            <div class="flex-container">
+                <div class="status-display">
+                    <span>Números enviados:</span>
+                    <strong id="visorNumEnviados">0</strong>
+                </div>
+                <button class="btn btn-success" onclick="checharNumEnviados()">Atualizar</button>
             </div>
         </div>
         
@@ -408,6 +429,42 @@
                 showNotification("Erro ao atualizar status!", true);
             }
         }
+
+        async function checharNumTotais() {
+            try {
+                const resposta = await fetch("https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-checknumtotais", { method: 'GET' });
+                const data = await resposta.json().catch(async () => await resposta.text());
+                document.getElementById("visorNumTotais").innerHTML = JSON.stringify(data);
+                showNotification("Status atualizado com sucesso!");
+            } catch (error) {
+                console.error('Erro ao verificar disparos:', error);
+                showNotification("Erro ao atualizar status!", true);
+            }
+        }
+
+        async function checharTentativas() {
+            try {
+                const resposta = await fetch("https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-checktentativas", { method: 'GET' });
+                const data = await resposta.json().catch(async () => await resposta.text());
+                document.getElementById("visorTentativas").innerHTML = JSON.stringify(data);
+                showNotification("Status atualizado com sucesso!");
+            } catch (error) {
+                console.error('Erro ao verificar disparos:', error);
+                showNotification("Erro ao atualizar status!", true);
+            }
+        }
+
+        async function checharNumEnviados() {
+            try {
+                const resposta = await fetch("https://b4b-n8n.ajndqt.easypanel.host/webhook/controle-disparos-checkenviados", { method: 'GET' });
+                const data = await resposta.json().catch(async () => await resposta.text());
+                document.getElementById("visorNumEnviados").innerHTML = JSON.stringify(data);
+                showNotification("Status atualizado com sucesso!");
+            } catch (error) {
+                console.error('Erro ao verificar disparos:', error);
+                showNotification("Erro ao atualizar status!", true);
+            }
+        }
         
         async function reiniciarPlanilha() {
             if (confirm("Tem certeza que deseja reiniciar a planilha? Esta ação não pode ser desfeita.")) {
@@ -479,8 +536,10 @@
             checharDisparos();
             checktrava();
             checkDisparosOut();
+            checharNumEnviados();
+            checharNumTotais();
+            checharTentativas();
         }
     </script>
 </body>
 </html>
-
